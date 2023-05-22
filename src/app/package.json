@@ -5,7 +5,7 @@
   "private": true,
   "main": "main.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS=\"--openssl-legacy-provider --inspect\" next dev",
     "build": "NODE_ENV=production env-cmd -f environments/.env.build.local next build",
     "build:github": "next build",
     "build:static": "next build && next export -o ../../portal_build/out",
