@@ -244,6 +244,13 @@
 .leaflet-tooltip-right:before {
   border: none !important;
 }
+.annotator-chart-button {
+  position: absolute;
+  z-index: 100;
+  float: right;
+  left: calc(100% - 75px);
+  top: calc(100% - 40px);
+}
 
 .annotator-settings-button {
   position: absolute;

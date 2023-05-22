@@ -1128,8 +1128,8 @@ export default class Annotator extends Component<
       layer.unbindTooltip();
       /* Render base tooltip first to check offset */
       layer.bindTooltip(
-        `<span class='bp3-tag' 
-        style='color: #FFFFFF; 
+        `<span class='bp3-tag'
+        style='color: #FFFFFF;
         border-radius: 6px !important;
         background-color: ${layer.options.color};'>
           ${InvertedTags[layer.options.annotationTag]}
@@ -1383,7 +1383,7 @@ export default class Annotator extends Component<
   public resetControls(): void {
     this.setUserState("None");
     /* this.handleDrawRectangle.disable();
-    this.handleDrawPolygon.disable(); 
+    this.handleDrawPolygon.disable();
     this.handleRemoveAnnotation.disable(); */
     this.setSelectedAnnotation(null);
   }
@@ -1613,15 +1613,20 @@ export default class Annotator extends Component<
             <Card className={"main-annotator"}>
               <div id="annotation-map" className={"style-annotator"} />
               {this.backgroundImg ? (
-                <div className="annotator-settings-button">
-                  <AnnotatorSettings
-                    annotationOptions={this.state.annotationOptions}
-                    callbacks={{
-                      setAnnotatedAssetsHidden: this.setAnnotatedAssetsHidden,
-                      setAnnotationOptions: this.setAnnotationOptions,
-                    }}
-                  />
-                </div>
+                <>
+                  <div className="annotator-settings-button">
+                    <AnnotatorSettings
+                      annotationOptions={this.state.annotationOptions}
+                      callbacks={{
+                        setAnnotatedAssetsHidden: this.setAnnotatedAssetsHidden,
+                        setAnnotationOptions: this.setAnnotationOptions,
+                      }}
+                    />
+                  </div>
+                  <div className="annotator-chart-button">
+                    <Button icon="gantt-chart" />
+                  </div>
+                </>
               ) : null}
             </Card>
           </div>
