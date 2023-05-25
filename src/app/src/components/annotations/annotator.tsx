@@ -44,6 +44,7 @@ import { CreateGenericToast } from "@portal/utils/ui/toasts";
 import AnnotatorInstanceSingleton from "./utils/annotator.singleton";
 import AnnotationMenu from "./menu";
 import ImageBar from "./imagebar";
+import AnalyticsChart from "./AnalyticsChart";
 import SettingsModal from "./settingsmodal";
 import FileModal from "./filemodal";
 import AnnotatorSettings from "./utils/annotatorsettings";
@@ -78,6 +79,12 @@ function Coordinate(x: number, y: number): Point {
 }
 
 type UIState = null | "Predicting";
+
+type ChartData = {
+  type: string;
+  data: any;
+  videoFrame: string;
+};
 
 interface AnnotatorProps {
   project: string;
@@ -148,6 +155,8 @@ interface AnnotatorState {
     opacity: number;
   };
   currAnnotationPlaybackId: number;
+  isChartOpen: boolean;
+  chartData: ChartData | null;
 }
 
 /**
@@ -246,6 +255,8 @@ export default class Annotator extends Component<
         },
       },
       currAnnotationPlaybackId: 0,
+      isChartOpen: false,
+      chartData: null,
     };
 
     this.toaster = new Toaster({}, {});
@@ -808,6 +819,14 @@ export default class Annotator extends Component<
                 quotient * secondsInterval * 1000
               ).toString();
 
+              this.setState({
+                chartData: {
+                  type: asset.type,
+                  data: response.data,
+                  videoFrame: key,
+                },
+              });
+
               if (response.data.frames[key]) {
                 this.updateAnnotations(response.data.frames[key]);
               }
@@ -1167,6 +1186,7 @@ export default class Annotator extends Component<
 
     /* Checks if there is AssetReselection */
     const isAssetReselection = !(asset.assetUrl !== this.currentAsset.assetUrl);
+    this.setState({ chartData: null });
     console.log("asset", asset.url);
     console.log("currentasset", this.currentAsset.url);
     console.log("single analysis", singleAnalysis);
@@ -1574,15 +1594,19 @@ export default class Annotator extends Component<
               className={[isCollapsed, "image-bar"].join("")}
               id={"image-bar"}
             >
-              <ImageBar
-                ref={ref => {
-                  this.imagebarRef = ref;
-                }}
-                /* Only visible assets should be shown */
-                assetList={visibleAssets}
-                callbacks={{ selectAssetCallback: this.selectAsset }}
-                {...this.props}
-              />
+              {this.state.isChartOpen && this.state.chartData ? (
+                <AnalyticsChart />
+              ) : (
+                <ImageBar
+                  ref={ref => {
+                    this.imagebarRef = ref;
+                  }}
+                  /* Only visible assets should be shown */
+                  assetList={visibleAssets}
+                  callbacks={{ selectAssetCallback: this.selectAsset }}
+                  {...this.props}
+                />
+              )}
             </Card>
           </div>
 
@@ -1624,7 +1648,12 @@ export default class Annotator extends Component<
                     />
                   </div>
                   <div className="annotator-chart-button">
-                    <Button icon="gantt-chart" />
+                    <Button
+                      icon="gantt-chart"
+                      onClick={() => {
+                        this.setState({ isChartOpen: !this.state.isChartOpen });
+                      }}
+                    />
                   </div>
                 </>
               ) : null}
