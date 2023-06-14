@@ -1,20 +1,15 @@
 import React from "react";
-import { Card } from "@blueprintjs/core";
 import {
   CartesianGrid,
   Line,
   LineChart,
   ResponsiveContainer,
   Tooltip,
-  TooltipProps,
   XAxis,
   YAxis,
 } from "recharts";
-import { TagColours } from "../../constants/annotation";
-import {
-  NameType,
-  ValueType,
-} from "recharts/types/component/DefaultTooltipContent";
+import { TagColours } from "../../../constants/annotation";
+import customToolTip from "./customToolTip";
 
 interface AnalyticsChartProps {
   data: ChartDataType;
@@ -58,6 +53,7 @@ const getChartData = (
     const frameData: any = {
       name: frame,
     };
+    console.log(frames[frame]);
     const frameTags = getFrameTags(frames[frame], confidence);
     const uniqueFrameTagName = [...new Set(frameTags.map(tag => tag.name))];
 
@@ -85,27 +81,6 @@ const getUniqueTagNames = (frames: any, confidence: number): string[] => {
   return output;
 };
 
-const CustomTooltip = ({
-  active,
-  payload,
-  label,
-}: TooltipProps<ValueType, NameType>) => {
-  if (active && payload && payload.length) {
-    return (
-      <Card style={{ padding: 0, opacity: "90%", margin: 0 }}>
-        <ul style={{ padding: "5px 5px", listStyleType: "none" }}>
-          {payload.map(item => (
-            <li key={item.dataKey} style={{ color: item.color }}>
-              {item.name}: {item.value}
-            </li>
-          ))}
-        </ul>
-      </Card>
-    );
-  }
-
-  return null;
-};
 const AnalyticsChart = ({ data, confidence, seek }: AnalyticsChartProps) => {
   const chartData = getChartData(data.frames, confidence);
   const uniqueTagNames = getUniqueTagNames(data.frames, confidence);
@@ -122,7 +97,7 @@ const AnalyticsChart = ({ data, confidence, seek }: AnalyticsChartProps) => {
         <CartesianGrid strokeDasharray="1 1" />
         <XAxis dataKey="name" />
         <YAxis />
-        <Tooltip content={CustomTooltip} />
+        <Tooltip content={customToolTip} />
         {uniqueTagNames.map((tag: string, idx) => {
           const tagColor = TagColours[idx];
           return (

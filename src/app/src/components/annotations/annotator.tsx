@@ -44,7 +44,7 @@ import { CreateGenericToast } from "@portal/utils/ui/toasts";
 import AnnotatorInstanceSingleton from "./utils/annotator.singleton";
 import AnnotationMenu from "./menu";
 import ImageBar from "./imagebar";
-import AnalyticsChart from "./AnalyticsChart";
+import AnalyticsChart from "./analytics/analyticsChart";
 import SettingsModal from "./settingsmodal";
 import FileModal from "./filemodal";
 import AnnotatorSettings from "./utils/annotatorsettings";
