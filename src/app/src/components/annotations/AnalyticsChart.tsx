@@ -114,7 +114,9 @@ const AnalyticsChart = ({ data, confidence, seek }: AnalyticsChartProps) => {
       <LineChart
         data={chartData}
         onClick={e => {
-          seek(Number(e?.activeLabel));
+          e?.activeLabel === undefined
+            ? console.log(e?.activeLabel)
+            : seek(Number(e?.activeLabel));
         }}
       >
         <CartesianGrid strokeDasharray="1 1" />
