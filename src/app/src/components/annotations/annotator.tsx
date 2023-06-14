@@ -1594,8 +1594,12 @@ export default class Annotator extends Component<
               className={[isCollapsed, "image-bar"].join("")}
               id={"image-bar"}
             >
+              {/* qwerty */}
               {this.state.isChartOpen && this.state.chartData ? (
-                <AnalyticsChart />
+                <AnalyticsChart
+                  data={this.state.chartData.data}
+                  confidence={this.state.confidence}
+                />
               ) : (
                 <ImageBar
                   ref={ref => {

@@ -38,7 +38,7 @@
 }
 
 .image-bar {
-  height: calc(100% - 70px);
+  height: 100%;
   margin-top: 10px;
   padding-right: 6px;
   overflow-y: hidden;
