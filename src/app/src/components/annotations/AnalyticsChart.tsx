@@ -19,6 +19,7 @@ import {
 interface AnalyticsChartProps {
   data: ChartDataType;
   confidence: number;
+  seek: (frame: number) => void;
 }
 
 type ChartDataType = {
@@ -105,12 +106,17 @@ const CustomTooltip = ({
 
   return null;
 };
-const AnalyticsChart = ({ data, confidence }: AnalyticsChartProps) => {
+const AnalyticsChart = ({ data, confidence, seek }: AnalyticsChartProps) => {
   const chartData = getChartData(data.frames, confidence);
   const uniqueTagNames = getUniqueTagNames(data.frames, confidence);
   return (
     <ResponsiveContainer width="100%" height={130}>
-      <LineChart data={chartData}>
+      <LineChart
+        data={chartData}
+        onClick={e => {
+          seek(Number(e?.activeLabel));
+        }}
+      >
         <CartesianGrid strokeDasharray="1 1" />
         <XAxis dataKey="name" />
         <YAxis />

@@ -1565,6 +1565,13 @@ export default class Annotator extends Component<
       this.isAssetVisible()
     );
 
+    const seek = (frame: number): void => {
+      const element = this.videoOverlay?.getElement();
+      if (element) {
+        element.currentTime = frame / 1000;
+        element.pause();
+      }
+    };
     return (
       <div>
         <Toaster {...this.state} ref={this.refHandlers.toaster} />
@@ -1599,6 +1606,7 @@ export default class Annotator extends Component<
                 <AnalyticsChart
                   data={this.state.chartData.data}
                   confidence={this.state.confidence}
+                  seek={seek}
                 />
               ) : (
                 <ImageBar
