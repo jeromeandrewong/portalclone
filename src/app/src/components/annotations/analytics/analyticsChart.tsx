@@ -12,16 +12,10 @@ import { TagColours } from "../../../constants/annotation";
 import customToolTip from "./customToolTip";
 
 interface AnalyticsChartProps {
-  data: ChartData;
+  frameGroup: FrameGroup;
   confidence: number;
   seek: (frame: number) => void;
 }
-
-type ChartData = {
-  fps: number;
-  frames: FrameGroup;
-  annotationID: string;
-};
 
 type FrameGroup = {
   [key: number]: Frame[];
@@ -44,26 +38,26 @@ type RechartFrameData = {
   [key: string]: number;
 };
 
-const getFrameTags = (data: Frame[], confidence: number): FrameTag[] => {
-  // return only  tags that are above confidence level
-  const filteredTags = data
+const getFrameTags = (frames: Frame[], confidence: number): FrameTag[] => {
+  // return only tags from list of frames that are above confidence level
+  const filteredTags = frames
     .filter((item: { confidence: number }) => item.confidence >= confidence)
     .map((item: { tag: FrameTag }) => item.tag);
   return filteredTags;
 };
 
 const getChartData = (
-  frames: FrameGroup,
+  frameGroup: FrameGroup,
   confidence: number
 ): RechartFrameData[] => {
   // returns [{}] (for recharts), each {} contains count of tag appearing for a single frame.
   const output: RechartFrameData[] = [];
-  for (const frame in frames) {
+  for (const frames in frameGroup) {
     const frameData: RechartFrameData = {
-      name: Number(frame),
+      frameGroup: Number(frames),
     };
 
-    const frameTags = getFrameTags(frames[frame], confidence);
+    const frameTags = getFrameTags(frameGroup[frames], confidence);
 
     frameTags.forEach(key => {
       if (key.name in frameData) {
@@ -79,27 +73,31 @@ const getChartData = (
   return output;
 };
 const getUniqueTagNames = (
-  frames: FrameGroup,
+  frameGroup: FrameGroup,
   confidence: number
 ): string[] => {
   // represents each line in the chart
   let output: string[] = [];
 
-  for (const frame in frames) {
-    const allFrameTags = getFrameTags(frames[frame], confidence);
+  for (const frames in frameGroup) {
+    const allFrameTags = getFrameTags(frameGroup[frames], confidence);
     output.push(...new Set(allFrameTags.map(tag => tag.name)));
   }
   output = [...new Set(output)];
   return output;
 };
 
-const AnalyticsChart = ({ data, confidence, seek }: AnalyticsChartProps) => {
-  const chartData = getChartData(data.frames, confidence);
-  const uniqueTagNames = getUniqueTagNames(data.frames, confidence);
+const AnalyticsChart = ({
+  frameGroup,
+  confidence,
+  seek,
+}: AnalyticsChartProps) => {
+  const rechartFrameData = getChartData(frameGroup, confidence);
+  const uniqueTagNames = getUniqueTagNames(frameGroup, confidence);
   return (
     <ResponsiveContainer width="100%" height={130}>
       <LineChart
-        data={chartData}
+        data={rechartFrameData}
         onClick={e => {
           e?.activeLabel === undefined
             ? console.log(e?.activeLabel)
@@ -107,7 +105,7 @@ const AnalyticsChart = ({ data, confidence, seek }: AnalyticsChartProps) => {
         }}
       >
         <CartesianGrid strokeDasharray="1 1" />
-        <XAxis dataKey="name" />
+        <XAxis dataKey="frameGroup" />
         <YAxis />
         <Tooltip content={customToolTip} />
         {uniqueTagNames.map((tag: string, idx) => {
