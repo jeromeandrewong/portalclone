@@ -64,14 +64,13 @@ const getChartData = (
     };
 
     const frameTags = getFrameTags(frames[frame], confidence);
-    const uniqueFrameTagName = [...new Set(frameTags.map(tag => tag.name))];
-
-    uniqueFrameTagName.forEach(key => {
-      frameData[key] = 0;
-    });
 
     frameTags.forEach(key => {
-      frameData[key.name]++;
+      if (key.name in frameData) {
+        frameData[key.name]++;
+      } else {
+        frameData[key.name] = 0;
+      }
     });
 
     output.push(frameData);
@@ -85,6 +84,7 @@ const getUniqueTagNames = (
 ): string[] => {
   // represents each line in the chart
   let output: string[] = [];
+
   for (const frame in frames) {
     const allFrameTags = getFrameTags(frames[frame], confidence);
     output.push(...new Set(allFrameTags.map(tag => tag.name)));
