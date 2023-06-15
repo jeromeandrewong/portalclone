@@ -12,30 +12,39 @@ import { TagColours } from "../../../constants/annotation";
 import customToolTip from "./customToolTip";
 
 interface AnalyticsChartProps {
-  data: ChartDataType;
+  data: ChartData;
   confidence: number;
   seek: (frame: number) => void;
 }
 
-type ChartDataType = {
+type ChartData = {
   fps: number;
-  frames: {
-    bound: number[][];
-    boundType: string;
-    confidence: number;
-    tag: {
-      id: number;
-      name: string;
-    };
-    annotationID: string;
-  };
+  frames: FrameGroup;
+  annotationID: string;
 };
+
+type FrameGroup = {
+  [key: number]: Frame[];
+};
+
 type FrameTag = {
   id: number;
   name: string;
 };
 
-const getFrameTags = (data: any, confidence: number): FrameTag[] => {
+type Frame = {
+  bound: number[][];
+  boundType: string;
+  confidence: number;
+  tag: FrameTag;
+  annotationID: string;
+};
+
+type RechartFrameData = {
+  [key: string]: number;
+};
+
+const getFrameTags = (data: Frame[], confidence: number): FrameTag[] => {
   // return only  tags that are above confidence level
   const filteredTags = data
     .filter((item: { confidence: number }) => item.confidence >= confidence)
@@ -44,16 +53,16 @@ const getFrameTags = (data: any, confidence: number): FrameTag[] => {
 };
 
 const getChartData = (
-  frames: any,
+  frames: FrameGroup,
   confidence: number
-): { [key: string]: number }[] => {
+): RechartFrameData[] => {
   // returns [{}] (for recharts), each {} contains count of tag appearing for a single frame.
-  const output: any[] = [];
+  const output: RechartFrameData[] = [];
   for (const frame in frames) {
-    const frameData: any = {
-      name: frame,
+    const frameData: RechartFrameData = {
+      name: Number(frame),
     };
-    console.log(frames[frame]);
+
     const frameTags = getFrameTags(frames[frame], confidence);
     const uniqueFrameTagName = [...new Set(frameTags.map(tag => tag.name))];
 
@@ -70,9 +79,12 @@ const getChartData = (
 
   return output;
 };
-const getUniqueTagNames = (frames: any, confidence: number): string[] => {
+const getUniqueTagNames = (
+  frames: FrameGroup,
+  confidence: number
+): string[] => {
   // represents each line in the chart
-  let output = [];
+  let output: string[] = [];
   for (const frame in frames) {
     const allFrameTags = getFrameTags(frames[frame], confidence);
     output.push(...new Set(allFrameTags.map(tag => tag.name)));
