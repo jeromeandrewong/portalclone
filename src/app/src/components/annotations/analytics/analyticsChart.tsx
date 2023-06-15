@@ -69,7 +69,7 @@ const getChartData = (
       if (key.name in frameData) {
         frameData[key.name]++;
       } else {
-        frameData[key.name] = 0;
+        frameData[key.name] = 1;
       }
     });
 
