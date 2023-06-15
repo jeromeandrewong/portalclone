@@ -1608,6 +1608,8 @@ export default class Annotator extends Component<
                   confidence={this.state.confidence}
                   seek={seek}
                 />
+              ) : this.state.isChartOpen && !this.state.chartData ? (
+                <p>Analyse the data to view graph.</p>
               ) : (
                 <ImageBar
                   ref={ref => {
