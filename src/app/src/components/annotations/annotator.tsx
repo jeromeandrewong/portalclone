@@ -81,9 +81,7 @@ function Coordinate(x: number, y: number): Point {
 type UIState = null | "Predicting";
 
 type ChartData = {
-  type: string;
   data: any;
-  videoFrame: string;
 };
 
 interface AnnotatorProps {
@@ -821,9 +819,7 @@ export default class Annotator extends Component<
 
               this.setState({
                 chartData: {
-                  type: asset.type,
-                  data: response.data,
-                  videoFrame: key,
+                  data: response.data.frames,
                 },
               });
 
@@ -1604,7 +1600,7 @@ export default class Annotator extends Component<
               {/* qwerty */}
               {this.state.isChartOpen && this.state.chartData ? (
                 <AnalyticsChart
-                  frames={this.state.chartData.data.frames}
+                  frames={this.state.chartData.data}
                   confidence={this.state.confidence}
                   seek={seek}
                 />
