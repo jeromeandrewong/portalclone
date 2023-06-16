@@ -47,27 +47,43 @@ const getFilteredItemTags = (Items: Item[], confidence: number): ItemTag[] => {
 };
 
 const getChartData = (
-  frameGroup: Frames,
+  frames: Frames,
   confidence: number
 ): RechartFrameData[] => {
-  // returns [{}] (for recharts), each {} contains count of tag appearing for a single frame.
+  // returns [{}] (for recharts), each {} contains count of item appearing for a single frame.
 
-  const output: RechartFrameData[] = [];
-  for (const frames in frameGroup) {
-    const frameData: RechartFrameData = {
-      frameGroup: Number(frames),
-    };
+  const itemArr = Object.values(frames);
+  const allItemTags = itemArr.map(item =>
+    getFilteredItemTags(item, confidence)
+  );
 
-    const frameTags = getFilteredItemTags(frameGroup[frames], confidence);
+  //map to record count of each item for each frame (k: id, v:count)
+  const itemCountMap: Map<string, number>[] = allItemTags.map(tagArr =>
+    tagArr.reduce(
+      (acc, tag) => acc.set(tag.name, (acc.get(tag.name) || 0) + 1),
+      new Map()
+    )
+  );
 
-    frameTags.forEach(key => {
-      frameData[key.name] = frameData[key.name] ? frameData[key.name] + 1 : 1;
-    });
+  const frameNames: string[] = Object.keys(frames);
 
-    output.push(frameData);
-  }
+  const itemCountArr = itemCountMap.map(item => [...item.entries()]);
+  console.log(itemCountArr[0]);
 
-  return output;
+  const allTagCountDistribition: RechartFrameData[] = itemCountArr.map(
+    (tagCount, i) => {
+      return tagCount.reduce(
+        (acc, [name, count]) => {
+          acc[name] = count;
+          return acc;
+        },
+        {
+          frame: Number(frameNames[i]),
+        } as RechartFrameData
+      );
+    }
+  );
+  return allTagCountDistribition;
 };
 const getUniqueTagNames = (frames: Frames, confidence: number): string[] => {
   // HOF > loops
@@ -77,7 +93,7 @@ const getUniqueTagNames = (frames: Frames, confidence: number): string[] => {
     getFilteredItemTags(item, confidence)
   );
   const allItemTagName = allItemTags.reduce(
-    (acc, tags) => [...acc, ...tags.map(tag => tag.name)],
+    (acc, tagArr) => [...acc, ...tagArr.map(tag => tag.name)],
     [] as string[]
   );
   const uniqueItemTagNames = [...new Set(allItemTagName)];
@@ -98,7 +114,7 @@ const AnalyticsChart = ({ frames, confidence, seek }: AnalyticsChartProps) => {
         }}
       >
         <CartesianGrid strokeDasharray="1 1" />
-        <XAxis dataKey="frameGroup" />
+        <XAxis dataKey="frame" />
         <YAxis />
         <Tooltip content={customToolTip} />
         {uniqueTagNames.map((tag: string, idx) => {
