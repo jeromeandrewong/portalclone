@@ -1604,7 +1604,7 @@ export default class Annotator extends Component<
               {/* qwerty */}
               {this.state.isChartOpen && this.state.chartData ? (
                 <AnalyticsChart
-                  frameGroup={this.state.chartData.data.frames}
+                  frames={this.state.chartData.data.frames}
                   confidence={this.state.confidence}
                   seek={seek}
                 />
